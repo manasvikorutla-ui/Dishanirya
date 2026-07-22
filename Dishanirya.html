@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dishanirya</title>
+    <!-- Use the Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Leaflet CSS for the map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4xn+LwB4wB3+P+V2FwY4h2C0F2F5+V3wz5F8wz5w3B8=" crossorigin="" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            @apply bg-gray-100;
+        }
+
+        .page {
+            @apply hidden transition-opacity duration-300 ease-in-out opacity-0;
+        }
+
+        .page.active {
+            @apply block opacity-100;
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 1.5rem;
+        }
+
+        #logo {
+            height: 200px;
+            padding-bottom: 10px;
+            margin-left: 335px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800 p-4 sm:p-6 lg:p-8">
+*/
+    <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-lg p-6 sm:p-8 lg:p-10 min-h-[80vh] flex flex-col">
+
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <img src="assets\logo.jpg" id="logo" />
+            <h1 class="text-4xl font-extrabold text-indigo-600">Dishanirya</h1>
+            <p class="mt-2 text-lg text-gray-500">Your interactive tour to the campus.</p>
+        </header>
+
+        <!-- Navigation Bar -->
+        <nav class="flex justify-around items-center bg-indigo-500 rounded-2xl p-2 mb-6 shadow-md">
+            <button id="home-btn"
+                class="nav-btn bg-white text-indigo-500 font-semibold py-2 px-4 rounded-xl transition-all duration-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                Home
+            </button>
+            <button id="map-btn"
+                class="nav-btn text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                Map
+            </button>
+            <button id="directory-btn"
+                class="nav-btn text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                Directory
+            </button>
+        </nav>
+
+        <!-- Page Containers -->
+        <main class="flex-grow">
+            <!-- Home Page -->
+            <div id="home-page" class="page active">
+                <div class="text-center py-8">
+                    <h2 class="text-3xl font-bold mb-4">Welcome to Campus!</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">
+                        This guide will help you navigate your way around. Explore key locations, find departments, and
+                        get to know the campus.
+                    </p>
+                    <img src="https://placehold.co/800x400/3B82F6/ffffff?text=Malla+Reddy+(MR)+Deemed+to+be+University"
+                        onerror="this.src='https://placehold.co/800x400/60a5fa/ffffff?text=Main+Campus+Building+Image+Failed+to+Load'"
+                        alt="Main Campus Building" class="mt-6 mx-auto w-full rounded-2xl shadow-lg">
+                    <section class="mt-10 text-left">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Featured Locations</h3>
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <div
+                                class="bg-indigo-50 p-6 rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-200">
+                                <h4 class="text-xl font-bold text-indigo-700"> Admin Block</h4>
+                                <p class="mt-2 text-gray-600">The Central hub for all institutional management and
+                                    student services.</p>
+                            </div>
+                            <div
+                                class="bg-emerald-50 p-6 rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-200">
+                                <h4 class="text-xl font-bold text-emerald-700">The Main Library</h4>
+                                <p class="mt-2 text-gray-600">A central hub for academic resources and quiet study
+                                    environments.</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Map Page -->
+            <div id="map-page" class="page">
+                <div class="text-center py-8">
+                    <h2 class="text-3xl font-bold mb-4">Interactive Campus Map</h2>
+                    <p class="text-gray-600 mb-4">Click the markers to see information about each location.</p>
+                    <div id="map" class="rounded-2xl shadow-lg">
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Directory Page -->
+            <div id="directory-page" class="page">
+                <div class="text-center py-8">
+                    <h2 class="text-3xl font-bold mb-4">Building Directory</h2>
+                    <div class="mb-6">
+                        <input type="text" id="directory-search" placeholder="Search buildings..."
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div id="directory-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Directory Card 1 -->
+                        <a href="Admin.html">
+                            <div class="directory-item bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm">
+                                <h3 class="text-xl font-bold text-indigo-700">Administration Building</h3>
+                                <p class="mt-2 text-gray-600 text-sm">Location: Main Entrance</p>
+                                <p class="mt-1 text-gray-500 text-sm">The central office for administrative and
+                                    admissions staff.</p>
+                            </div>
+                        </a>
+                        <!-- Directory Card 2 -->
+                        <a href="exambr.html">
+                            <div class="directory-item bg-yellow-50 border border-yellow-200 p-6 rounded-2xl shadow-sm">
+                                <h3 class="text-xl font-bold text-yellow-700">Examination Branch</h3>
+                                <p class="mt-2 text-gray-600 text-sm">Location: East Side</p>
+                                <p class="mt-1 text-gray-500 text-sm">Manages all exam related activities including
+                                    evaluation and results.</p>
+                            </div>
+                        </a>
+                        <!-- Directory Card 3 -->
+                        <a href="library.html">
+                            <div class="directory-item bg-green-50 border border-green-200 p-6 rounded-2xl shadow-sm">
+                                <h3 class="text-xl font-bold text-green-700">Main Library</h3>
+                                <p class="mt-2 text-gray-600 text-sm">Location: East Campus</p>
+                                <p class="mt-1 text-gray-500 text-sm">The main resource hub with extensive collections
+                                    and study rooms.</p>
+                            </div>
+                        </a>
+                        <!-- Directory Card 4 -->
+                        <a href="cse.html">
+                            <div class="directory-item bg-rose-50 border border-rose-200 p-6 rounded-2xl shadow-sm">
+                                <h3 class="text-xl font-bold text-rose-700">CSE Block</h3>
+                                <p class="mt-2 text-gray-600 text-sm">Location: East Campus</p>
+                                <p class="mt-1 text-gray-500 text-sm">Primary building for all engineering and computer
+                                    science classes.</p>
+                            </div>
+                        </a>
+                        <!-- Directory Card 5 -->
+                        <a href="Audit.html">
+                            <div class="directory-item bg-blue-50 border border-blue-200 p-6 rounded-2xl shadow-sm">
+                                <h3 class="text-xl font-bold text-blue-700">Auditorium</h3>
+                                <p class="mt-2 text-gray-600 text-sm">Location: West Side</p>
+                                <p class="mt-1 text-gray-500 text-sm">Hosting events, seminars, cultural programs and
+                                    large gatherings. </p>
+                            </div>
+                        </a>
+                        <!-- Directory Card 6 -->
+                        <a href="canteen.html">
+                            <div
+                                class="directory-item bg-fuchsia-50 border border-fuchsia-200 p-6 rounded-2xl shadow-sm">
+                                <h3 class="text-xl font-bold text-fuchsia-700">Canteen</h3>
+                                <p class="mt-2 text-gray-600 text-sm">Location: South-west side</p>
+                                <p class="mt-1 text-gray-500 text-sm">Providing food and refreshments to students and
+                                    staff.</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Custom Message Modal (instead of alert) -->
+        <div id="message-modal"
+            class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center">
+                <p id="modal-text" class="text-gray-700 text-lg font-semibold mb-4"></p>
+                <button onclick="closeModal()"
+                    class="bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-kLaT2GOSpHezcdFz9+3qK7S5L5gX9i3G5n9fP3w5C6G8=" crossorigin=""></script>
+
+    <script>
+        // Get all the navigation buttons and pages
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const pages = document.querySelectorAll('.page');
+        const mapDiv = document.getElementById('map');
+        const directorySearch = document.getElementById('directory-search');
+        const directoryItems = document.querySelectorAll('.directory-item');
+        let mymap = null;
+
+        // Function to show a specific page and hide others
+        function showPage(pageId) {
+            pages.forEach(page => page.classList.remove('active'));
+            navButtons.forEach(btn => {
+                btn.classList.remove('bg-white', 'text-indigo-500');
+                btn.classList.add('text-white', 'bg-indigo-500', 'hover:bg-indigo-600');
+            });
+
+            const activePage = document.getElementById(pageId);
+            if (activePage) {
+                activePage.classList.add('active');
+            }
+
+            const activeButton = document.getElementById(pageId.replace('-page', '-btn'));
+            if (activeButton) {
+                activeButton.classList.remove('text-white', 'bg-indigo-500', 'hover:bg-indigo-600');
+                activeButton.classList.add('bg-white', 'text-indigo-500');
+            }
+
+            // If the map page is active, initialize the map
+            if (pageId === 'map-page' && !mymap) {
+                initializeMap();
+            }
+        }
+
+        // Initialize the Leaflet map
+        function initializeMap() {
+            // A central coordinate for a hypothetical campus
+            const campusCenter = [40.7128, -74.0060]; // Example: New York City
+            mymap = L.map('map').setView(campusCenter, 16);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(mymap);
+
+            // Add markers for sample buildings
+            const locations = [
+                { coords: [40.7135, -74.0075], name: 'Student Union' },
+                { coords: [40.7120, -74.0040], name: 'Engineering Hall' },
+                { coords: [40.7150, -74.0050], name: 'Main Library' },
+                { coords: [40.7110, -74.0080], name: 'Athletic Center' },
+            ];
+
+            locations.forEach(location => {
+                L.marker(location.coords)
+                    .addTo(mymap)
+                    .bindPopup(`<b>${location.name}</b><br>Welcome!`)
+                    .openPopup();
+            });
+        }
+
+        // Search functionality for the directory
+        directorySearch.addEventListener('input', (event) => {
+            const searchTerm = event.target.value.toLowerCase();
+            directoryItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Function to show custom modal instead of alert()
+        function alertMessage(message) {
+            const modal = document.getElementById('message-modal');
+            const modalText = document.getElementById('modal-text');
+            modalText.textContent = message;
+            modal.classList.remove('hidden');
+        }
+
+        // Function to close the custom modal
+        function closeModal() {
+            const modal = document.getElementById('message-modal');
+            modal.classList.add('hidden');
+        }
+
+        // Set up event listeners for navigation buttons
+        document.getElementById('home-btn').addEventListener('click', () => showPage('home-page'));
+        document.getElementById('map-btn').addEventListener('click', () => showPage('map-page'));
+        document.getElementById('directory-btn').addEventListener('click', () => showPage('directory-page'));
+
+        // Initial state: show the home page
+        window.onload = () => {
+            showPage('home-page');
+        };
+    </script>
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCDxrafMDL3PspxbR8kLufHhJRQutjM3U&callback=initMap&v=weekly"
+        defer>
+        </script>
+
+    <script>
+        // A global variable to hold the map instance
+        let map;
+        // A global variable for the InfoWindow
+        let infoWindow;
+
+        // This function is called automatically by the Google Maps API script
+        function initMap() {
+            // Set a specific campus location (replace with your campus coordinates)
+            const campusCenter = { lat: 17.559158037760312, lng: 78.45107466979888 };
+            // Create the map instance
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: campusCenter,
+                zoom: 16,
+                mapTypeId: 'roadmap',
+            });
+
+            // Create a new InfoWindow
+            infoWindow = new google.maps.InfoWindow();
+
+            // Define the locations with their coordinates and descriptions
+            const locations = [
+                {
+                    position: { lat: 17.558435790054638, lng: 78.45165381318107 },
+                    title: 'Administration Building',
+                    info: 'The central office for administrative and admissions staff.'
+                },
+                {
+                    position: { lat: 17.558296731555814, lng: 78.45246288899664 },
+                    title: 'Examination Branch',
+                    info: 'Manages all exam related activities including evaluation and results.'
+                },
+                {
+                    position: { lat: 17.558317721524567, lng: 78.45174187586859 },
+                    title: 'Main Library',
+                    info: 'The main resource hub with extensive collections and study rooms.'
+                },
+                {
+                    position: { lat: 17.55778772408469, lng: 78.45362971940487 },
+                    title: 'CSE Block',
+                    info: 'Primary building for all engineering and computer science classes.'
+                },
+                {
+                    position: { lat: 17.55895256783513, lng: 78.4541704334267 },
+                    title: 'Auditorium',
+                    info: 'Hosting events, seminars, cultural programs and large gatherings.'
+                },
+                {
+                    position: { lat: 17.55925912739694, lng: 78.45341212561252 },
+                    title: 'Canteen',
+                    info: 'Providing food and refreshments to students and staff.'
+                }
+            ];
+
+            // Loop through the locations and add a marker for each one
+            locations.forEach(location => {
+                const marker = new google.maps.Marker({
+                    position: location.position,
+                    map: map,
+                    title: location.title
+                });
+
+                // Add a click listener to each marker
+                marker.addListener("click", () => {
+                    // Set the content for the InfoWindow and open it on the map
+                    infoWindow.setContent(`
+                    <h3>${location.title}</h3>
+                    <p>${location.info}</p>
+                    `);
+                    infoWindow.open(map, marker);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

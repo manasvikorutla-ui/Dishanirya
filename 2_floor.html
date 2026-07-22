@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2nd Floor Navigator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #1e293b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .ar-overlay-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+        }
+
+        #ar-simulation {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+            background-color: #000;
+        }
+
+        #ar-path-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ar-path {
+            stroke: #2563eb;
+            stroke-width: 15;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 5px rgba(37, 99, 235, 0.7));
+            animation: dash 5s linear infinite;
+        }
+
+        @keyframes dash {
+            from {
+                stroke-dashoffset: 1000;
+            }
+
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="selection:bg-blue-200">
+    <!-- Main Application Container -->
+    <div id="app"
+        class="bg-white rounded-3xl shadow-xl w-full max-w-sm md:max-w-md lg:max-w-lg p-6 flex flex-col items-center space-y-6">
+
+        <!-- Title and Description -->
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-gray-800">2nd Floor Navigator</h1>
+            <p class="text-gray-500 mt-2">Find your way with AR-like guidance.</p>
+        </div>
+
+        <!-- Location Status and User ID -->
+        <div id="location-status" class="w-full text-center text-sm text-gray-600">
+            Location: Using a placeholder location.
+        </div>
+        <div class="w-full text-center text-xs text-gray-400">
+            Your ID: Using a placeholder ID.
+        </div>
+
+        <!-- Destination Selection Screen -->
+        <div id="destination-screen" class="w-full flex flex-col items-center space-y-4">
+            <h2 class="text-xl font-semibold mt-4 text-center">Choose Your Destination</h2>
+            <div id="destination-grid" class="grid grid-cols-2 gap-4 w-full">
+                <!-- Destinations will be populated here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Navigation Screen (hidden by default) -->
+        <div id="navigation-screen"
+            class="w-full h-96 hidden flex-col items-center justify-center relative rounded-xl overflow-hidden bg-black">
+            <div class="ar-overlay-container w-full h-full relative">
+                <!-- Video element for camera feed -->
+                <video id="ar-simulation" class="w-full h-full" playsinline autoplay muted></video>
+                <div id="camera-status" class="absolute inset-0 flex justify-center items-center text-white text-lg">
+                    Accessing camera...
+                </div>
+                <svg id="ar-path-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"
+                    preserveAspectRatio="xMidYMid slice">
+                    <path id="ar-path" d="" />
+                </svg>
+            </div>
+
+            <button onclick="stopNavigation()"
+                class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-red-600 text-white font-bold py-2 px-6 rounded-full shadow-lg hover:bg-red-700 transition-colors">
+                Stop Navigation
+            </button>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                initApp();
+            });
+
+
+            const destinations = [
+                { id: '201', name: 'Room 201', coords: { lat: 13.045, lng: 80.245 } },
+                { id: '202', name: 'Room 202', coords: { lat: 13.046, lng: 80.246 } },
+                { id: '203', name: 'Room 203', coords: { lat: 13.047, lng: 80.247 } },
+                { id: '204', name: 'Room 204', coords: { lat: 13.048, lng: 80.248 } },
+                { id: '205', name: 'Room 205', coords: { lat: 13.049, lng: 80.249 } },
+                { id: '206', name: 'Room 206', coords: { lat: 13.050, lng: 80.250 } },
+            ];
+
+            let cameraStream = null;
+
+            function initApp() {
+                renderDestinations();
+            }
+
+            // Render destination buttons dynamically
+            function renderDestinations() {
+                const grid = document.getElementById('destination-grid');
+                grid.innerHTML = ''; // Clear existing buttons
+                destinations.forEach(dest => {
+                    const button = document.createElement('button');
+                    button.textContent = dest.name;
+                    button.classList.add('bg-blue-600', 'text-white', 'font-semibold', 'py-4', 'px-6', 'rounded-2xl', 'shadow-md', 'hover:bg-blue-700', 'transition-colors');
+                    button.onclick = () => startNavigation(dest.coords);
+                    // tooltip for Rooms using the 'title' attribute
+                    if (dest.id === '201') {
+                        button.title = "Room 201 is the classroom.";
+                    }
+                    if (dest.id === '202') {
+                        button.title = "Room 202 is the classroom.";
+                    }
+                    if (dest.id === '203') {
+                        button.title = "Room 203 is the HOD office.";
+                    }
+                    if (dest.id === '204') {
+                        button.title = "Room 204 is the Lab.";
+                    }
+                    if (dest.id === '205') {
+                        button.title = "Room 205 is the Lab.";
+                    }
+                    if (dest.id === '206') {
+                        button.title = "Room 206 is the seminar hall.";
+                    }
+                    
+                    grid.appendChild(button);
+                });
+            }
+
+            // Start the navigation and camera feed
+            async function startNavigation(destinationCoords) {
+                document.getElementById('destination-screen').classList.add('hidden');
+                document.getElementById('navigation-screen').classList.remove('hidden');
+
+                const arVideo = document.getElementById('ar-simulation');
+                const path = document.getElementById('ar-path');
+                const cameraStatus = document.getElementById('camera-status');
+
+                // Simulate a path from a fixed starting point to the destination
+                const startPoint = { x: 500, y: 900 };
+                const endPoint = { x: 500, y: 100 };
+                const pathData = `M${startPoint.x},${startPoint.y} L${startPoint.x},${startPoint.y - 400} L${endPoint.x},${endPoint.y}`;
+                path.setAttribute('d', pathData);
+
+                try {
+                    // Request camera access
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    arVideo.srcObject = cameraStream;
+                    await arVideo.play();
+                    cameraStatus.classList.add('hidden');
+                } catch (error) {
+                    console.error("Error accessing the camera:", error);
+                    cameraStatus.textContent = "Camera access denied or unavailable.";
+                    cameraStatus.classList.remove('hidden');
+                    arVideo.style.display = 'none'; // Hide the video element
+                }
+            }
+
+            // Stop the navigation simulation and camera feed
+            window.stopNavigation = function () {
+                // Stop all video tracks to turn off the camera
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                    cameraStream = null; // Clear the stream reference
+                }
+
+                const arVideo = document.getElementById('ar-simulation');
+                arVideo.style.display = 'block'; // Ensure video is visible for next time
+                arVideo.srcObject = null; // Clear the video source
+
+                document.getElementById('destination-screen').classList.remove('hidden');
+                document.getElementById('navigation-screen').classList.add('hidden');
+                document.getElementById('ar-path').setAttribute('d', ''); // Clear the path
+                document.getElementById('camera-status').textContent = "Accessing camera...";
+            }
+        </script>
+    </div>
+
+</body>
+
+</html>
