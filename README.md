@@ -76,6 +76,9 @@ git clone https://github.com/manasvikorutla-ui/Dishanirya.git
 4. Allow camera permission (if prompted) to experience the AR-style navigation.
 
 ---
+## Live Demo ##
+
+https://manasvikorutla-ui.github.io/Dishanirya/
 
 ## 📸 Screenshots
 
